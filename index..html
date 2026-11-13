@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="am" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ጸያሔ ፍኖት ሰንበት ትምህርት ቤት | የክላውድ አስተዳደር ስርዓት</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Noto Sans Ethiopic & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans Ethiopic"', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        royal: { 950: '#041E3A', 900: '#08325C', 800: '#0B4982', 700: '#1062A8', 600: '#187BC7' },
+                        skybrand: { 500: '#2695D4', 400: '#4FB0E8', 100: '#E1F2FC', 50: '#F2F9FE' },
+                        goldaccent: { 500: '#D4AF37', 400: '#E5C454', 100: '#FCF6E3' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased selection:bg-skybrand-500 selection:text-white min-h-screen flex flex-col justify-between">
+
+    <!-- Top Security Banner -->
+    <div class="bg-royal-950 text-skybrand-100 text-xs sm:text-sm py-2 px-4 text-center border-b border-royal-800 flex items-center justify-center gap-3">
+        <span class="text-goldaccent-400">🔒</span>
+        <span>የጸያሔ ፍኖት ሰንበት ትምህርት ቤት — በ Firebase Cloud Database የሚመራ ደህንነቱ የተጠበቀ ስርዓት</span>
+        <span class="text-goldaccent-400">🔒</span>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo & Title -->
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-skybrand-500 to-royal-800 p-1.5 flex items-center justify-center shadow-md">
+                        <svg viewBox="0 0 200 180" class="w-full h-full fill-white" aria-hidden="true">
+                            <g stroke="white" stroke-width="4" stroke-linecap="round">
+                                <line x1="100" y1="12" x2="100" y2="32" />
+                                <line x1="72" y1="20" x2="82" y2="38" />
+                                <line x1="128" y1="20" x2="118" y2="38" />
+                            </g>
+                            <circle cx="100" cy="43" r="5" />
+                            <polygon points="100,52 72,66 128,66" />
+                            <rect x="78" y="66" width="44" height="10" rx="1" />
+                            <polygon points="100,74 42,102 158,102" />
+                            <rect x="58" y="102" width="84" height="32" />
+                            <path d="M22,145 Q60,130 100,148 Q140,130 178,145 L172,155 Q138,140 100,158 Q62,140 28,155 Z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="block text-lg font-bold text-royal-900 leading-tight">ጸያሔ ፍኖት</span>
+                        <span class="block text-xs font-medium text-skybrand-500">የክላውድ አስተዳደር እና አቴንዳንስ ሲስተም</span>
+                    </div>
+                </div>
+
+                <!-- Session Status / User Info -->
+                <div id="user-session-header" class="hidden items-center gap-3 bg-skybrand-50 px-4 py-2 rounded-2xl border border-skybrand-100">
+                    <div class="w-9 h-9 rounded-xl bg-royal-800 text-white font-bold flex items-center justify-center text-sm" id="user-avatar-initial">አ</div>
+                    <div>
+                        <p class="text-xs text-slate-500">የገቡበት መለያ:</p>
+                        <p class="text-sm font-bold text-royal-900" id="current-logged-role">አድሚን 1 / ሬጅስትራል</p>
+                    </div>
+                    <button onclick="logoutSystem()" class="ml-4 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-xl transition border border-rose-200">
+                        ውጣ (Logout)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Content Wrapper -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- VIEW 1: SECURE LOGIN SCREEN -->
+        <section id="login-view" class="max-w-md mx-auto bg-white rounded-3xl p-8 sm:p-10 shadow-xl border border-slate-200 my-8">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-skybrand-50 text-skybrand-500 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner font-bold">
+                    🔐
+                </div>
+                <h1 class="text-2xl font-extrabold text-royal-900">የኃላፊዎች መግቢያ (Login)</h1>
+                <p class="text-sm text-slate-500 mt-1">ለተወሰኑት 5 ኃላፊዎች ብቻ የተዘጋጀ ደህንነቱ የተጠበቀ ስርዓት</p>
+            </div>
+
+            <form onsubmit="handleLoginSubmit(event)" class="space-y-5">
+                <div>
+                    <label for="login-role" class="block text-sm font-bold text-slate-700 mb-1.5">የኃላፊነት ክፍልዎን ይምረጡ *</label>
+                    <select id="login-role" required class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-skybrand-500 outline-none text-sm bg-white font-medium">
+                        <option value="">-- ክፍሎቹን ይምረጡ --</option>
+                        <option value="registrar">1. አድሚን 1 / ሬጅስትራል (Registrar & Admin)</option>
+                        <option value="education">2. ትምህርት ክፍል (Education Dept)</option>
+                        <option value="choir">3. መዝሙር ክፍል (Choir Dept)</option>
+                        <option value="prayer">4. ጸሎት ክፍል (Prayer Dept)</option>
+                        <option value="communication">5. የግንኙነት ክፍል (Communication Dept)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="login-password" class="block text-sm font-bold text-slate-700 mb-1.5">የይለፍ ቃል (Password) *</label>
+                    <input type="password" id="login-password" required placeholder="የክፍሉን ሚስጥራዊ ቁጥር ያስገቡ..." class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-skybrand-500 outline-none text-sm bg-white">
+                </div>
+
+                <button type="submit" class="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-royal-800 to-skybrand-500 text-white font-bold text-base shadow-lg transition">
+                    ግባ (Login)
+                </button>
+            </form>
+        </section>
+
+        <!-- VIEW 2: DASHBOARD MAIN PANEL -->
+        <section id="dashboard-view" class="hidden space-y-8">
+            <!-- የሜኑ አዝራሮች (Tabs) - አንድ ንጹህ ዝርዝር ብቻ -->
+            <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-4">
+                <button onclick="switchDashboardTab('students')" id="tab-btn-students" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-royal-800 text-white shadow-sm">
+                    👥 የተማሪዎች ምዝገባ እና አስተዳደር
+                </button>
+                <button onclick="switchDashboardTab('attendance')" id="tab-btn-attendance" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white text-slate-600 hover:bg-slate-200">
+                    🕒 የአቴንዳንስ መከታተያ
+                </button>
+                <button onclick="switchDashboardTab('leaves')" id="tab-btn-leaves" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white text-slate-600 hover:bg-slate-200">
+                    📝 የፍቃድ ጥያቄዎች
+                </button>
+                <button onclick="switchDashboardTab('choir')" id="tab-btn-choir" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white text-slate-600 hover:bg-slate-200">
+                    🎵 የመዝሙር ክፍል (ካላንደር)
+                </button>
+            </div>
+
+            <div class="bg-gradient-to-r from-royal-900 via-royal-800 to-skybrand-500 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="space-y-2 text-center md:text-right">
+                    <span id="role-badge-tag" class="px-4 py-1 rounded-full bg-goldaccent-500 text-royal-950 font-bold text-xs uppercase">አድሚን</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                        እንኳን ደህና መጡ፣ <span id="welcome-username">አስተዳዳሪ</span>!
+                    </h2>
+                    <p class="text-skybrand-100 text-sm">የተማሪዎችን ምዝገባ እና አቴንዳንስ በክላውድ ዳታቤዝ ያስተዳድሩ።</p>
+                </div>
+                <div class="flex items-center gap-4 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
+                    <div class="text-center px-4 border-r border-white/20">
+                        <p class="text-xs text-skybrand-200 uppercase">ጠቅላላ ተማሪዎች</p>
+                        <p id="stat-total-students" class="text-2xl font-extrabold text-goldaccent-400">0</p>
+                    </div>
+                    <div class="text-center px-4">
+                        <p class="text-xs text-skybrand-200 uppercase">የተጠባባቂ ፍቃዶች</p>
+                        <p id="stat-pending-leaves" class="text-2xl font-extrabold text-white">0</p>
+                    </div>
+                </div>
+            </div>
+           
+            <!-- TAB 1: STUDENTS -->
+            <div id="tab-content-students" class="space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    
+                    <div id="registrar-reg-box" class="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                        <h3 class="text-xl font-bold text-royal-900 mb-2">➕ አዲስ ተማሪ መመዝገቢያ</h3>
+                        <p class="text-xs text-slate-500 mb-6">በአድሚን 1 / ሬጅስትራል ብቻ የሚሞላ</p>
+
+                        <form onsubmit="handleStudentRegister(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1">የተማሪው ሙሉ ስም *</label>
+                                <input type="text" id="reg-fullname" required placeholder="የግለሰቡን ሙሉ ስም..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1">የክርስትና ስም (የጥምቀት ስም) *</label>
+                                <input type="text" id="reg-christian-name" required placeholder="ለምሳሌ፦ ወልደ ስላሴ..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1">የትምህርት ደረጃ (Grade Level) *</label>
+                                <select id="reg-grade" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white">
+                                    <option value="">-- የትምህርት ደረጃ ይምረጡ --</option>
+                                    <option value="4ተኛ ክፍል">4ተኛ ክፍል</option>
+                                    <option value="5ተኛ ክፍል">5ተኛ ክፍል</option>
+                                    <option value="6ተኛ ክፍል">6ተኛ ክፍል</option>
+                                    <option value="7ተኛ ክፍል">7ተኛ ክፍል</option>
+                                    <option value="8ተኛ ክፍል">8ተኛ ክፍል</option>
+                                    <option value="9ተኛ ክፍል">9ተኛ ክፍል</option>
+                                    <option value="10ተኛ ክፍል">10ተኛ ክፍል</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1.5">የሚሳተፍባቸው ክፍሎች *</label>
+                                <div class="space-y-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                    <label class="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer">
+                                        <input type="checkbox" name="dept-checkbox" value="መዝሙር ክፍል" class="w-4 h-4 text-skybrand-500 rounded">
+                                        <span>መዝሙር ክፍል</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer">
+                                        <input type="checkbox" name="dept-checkbox" value="ትምህርት ክፍል" class="w-4 h-4 text-skybrand-500 rounded">
+                                        <span>ትምህርት ክፍል</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer">
+                                        <input type="checkbox" name="dept-checkbox" value="ጸሎት ክፍል" class="w-4 h-4 text-skybrand-500 rounded">
+                                        <span>ጸሎት ክፍል</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full py-3 px-4 rounded-xl bg-royal-800 hover:bg-royal-900 text-white font-bold text-sm shadow-md transition">
+                                ተማሪውን መዝግብ
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-royal-900">የተመዝጋቢዎች ዝርዝር (Cloud DB)</h3>
+                                <p class="text-xs text-slate-500">በክላውድ የተመዘገቡ ተማሪዎች</p>
+                            </div>
+                            <span id="student-count-badge" class="px-3 py-1 rounded-full bg-skybrand-50 text-royal-800 font-bold text-xs">0 ተማሪዎች</span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-200 text-xs font-bold text-slate-500 uppercase">
+                                        <th class="py-3 px-3">ስም / የክርስትና ስም</th>
+                                        <th class="py-3 px-3">ደረጃ</th>
+                                        <th class="py-3 px-3">ክፍሎች</th>
+                                        <th class="py-3 px-3 text-center">እርምጃ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="students-table-body" class="divide-y divide-slate-100 text-sm"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: ATTENDANCE -->
+            <div id="tab-content-attendance" class="hidden space-y-6">
+                <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                    <h3 class="text-xl font-bold text-royal-900 mb-2">🕒 የአቴንዳንስ መቆጣጠሪያ</h3>
+                    <p class="text-sm text-slate-500 mb-6">በኢትዮጵያ ሰዓት አቆጣጠር መሠረት የሚመዘገብበት</p>
+
+                    <form onsubmit="handleAttendanceSubmit(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1">ክፍል *</label>
+                                <select id="att-dept" required class="w-full px-4 py-2.5 rounded-xl border text-sm bg-white">
+                                    <option value="ትምህርት ክፍል">የትምህርት ክፍል (እሁድ 8-11)</option>
+                                    <option value="መዝሙር ክፍል">የመዝሙር ክፍል (ቅዳሜ 9-11 & ሰኞ-ሐሙስ 11-1)</option>
+                                    <option value="ጸሎት ክፍል">የጸሎት ክፍል (አርብ 11-1)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1">ቀን *</label>
+                                <select id="att-day" required class="w-full px-4 py-2.5 rounded-xl border text-sm bg-white">
+                                    <option value="እሁድ">እሁድ</option>
+                                    <option value="ቅዳሜ">ቅዳሜ</option>
+                                    <option value="አርብ">አርብ</option>
+                                    <option value="ከሰኞ እስከ ሐሙስ">ከሰኞ እስከ ሐሙስ</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1">ተማሪ ይምረጡ *</label>
+                                <select id="att-student-select" required class="w-full px-4 py-2.5 rounded-xl border text-sm bg-white">
+                                    <option value="">-- ተማሪ ይምረጡ --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1">ሁኔታ *</label>
+                                <select id="att-status" required class="w-full px-4 py-2.5 rounded-xl border text-sm bg-white">
+                                    <option value="ተገኝቷል">ተገኝቷል (Present)</option>
+                                    <option value="ቀረ">ቀረ (Absent)</option>
+                                    <option value="ዘግይቷል">ዘግይቶ መጣ (Late)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1">መዝጋቢ ኃላፊ *</label>
+                                <input type="text" id="att-recorder-name" required placeholder="ስምዎ..." class="w-full px-4 py-2.5 rounded-xl border text-sm bg-white">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 rounded-xl bg-royal-800 text-white font-bold text-sm shadow">አቴንዳንሱን መዝግብ</button>
+                    </form>
+
+                    <div class="mt-8">
+                        <h4 class="font-bold text-royal-900 mb-3">የተመዘገቡ አቴንዳንሶች</h4>
+                        <table class="w-full text-right text-sm">
+                            <thead>
+                                <tr class="border-b text-xs text-slate-500 uppercase">
+                                    <th class="py-2">ቀን</th><th class="py-2">ክፍል</th><th class="py-2">ተማሪ</th><th class="py-2">ሁኔታ</th><th class="py-2">መዝጋቢ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendance-table-body" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: LEAVES -->
+            <div id="tab-content-leaves" class="hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div class="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border">
+                        <h3 class="text-xl font-bold text-royal-900 mb-4">📝 የፍቃድ ጥያቄ ማቅረቢያ</h3>
+                        <form onsubmit="handleLeaveSubmit(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1">ተማሪ ይምረጡ *</label>
+                                <select id="leave-student" required class="w-full px-4 py-2.5 rounded-xl border text-sm bg-white">
+                                    <option value="">-- ተማሪ ይምረጡ --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1">ሰጪ አካል *</label>
+                                <input type="text" id="leave-grantor" required placeholder="ወላጅ/አሳዳጊ ስም..." class="w-full px-4 py-2.5 rounded-xl border text-sm bg-white">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 mb-1">ከመቼ (Start)</label>
+                                    <input type="text" id="leave-start" required placeholder="ቀን..." class="w-full px-3 py-2.5 rounded-xl border text-sm bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 mb-1">እስከ (End)</label>
+                                    <input type="text" id="leave-end" required placeholder="ቀን..." class="w-full px-3 py-2.5 rounded-xl border text-sm bg-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1">የተቀበለው ኃላፊ *</label>
+                                <input type="text" id="leave-receiver" required placeholder="የተቀበለው ሰው ስም..." class="w-full px-4 py-2.5 rounded-xl border text-sm bg-white">
+                            </div>
+                            <button type="submit" class="w-full py-3 rounded-xl bg-royal-800 text-white font-bold text-sm">የፍቃድ ጥያቄ ላክ</button>
+                        </form>
+                    </div>
+
+                    <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border">
+                        <h3 class="text-xl font-bold text-royal-900 mb-4">የፍቃድ ማጽደቂያ (Admin Approval)</h3>
+                        <table class="w-full text-right text-sm">
+                            <thead>
+                                <tr class="border-b text-xs text-slate-500 uppercase">
+                                    <th class="py-2">ተማሪ</th><th class="py-2">ጊዜ ገደብ</th><th class="py-2">ሁኔታ</th><th class="py-2 text-center">እርምጃ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaves-table-body" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: CHOIR CALENDAR (የኢትዮጵያ ካላንደር እና የመዝሙር ክፍል ዕቅድ) - አንድ ንጹህ ክፍል ብቻ -->
+            <div id="tab-content-choir" class="hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <!-- የካላንደር እቅድ መመዝገቢያ ፎርም -->
+                    <div class="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border">
+                        <h3 class="text-xl font-bold text-royal-900 mb-2">🗓️ የኢትዮጵያ ካላንደር እና ዕቅድ</h3>
+                        <form onsubmit="saveChoirDayPlan(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1">ወር *</label>
+                                <select id="eth-month-select" onchange="renderEthCalendar()" required class="w-full px-4 py-2.5 rounded-xl border">
+                                    <option value="መስከረም">መስከረም</option>
+                                    <option value="ጥቅምት">ጥቅምት</option>
+                                    <option value="ህዳር" selected>ህዳር</option>
+                                    <option value="ታህሳስ">ታህሳስ</option>
+                                    <option value="ጥር">ጥር</option>
+                                    <option value="የካቲት">የካቲት</option>
+                                    <option value="መጋቢት">መጋቢት</option>
+                                    <option value="ሚያዚያ">ሚያዚያ</option>
+                                    <option value="ግንቦት">ግንቦት</option>
+                                    <option value="ሰኔ">ሰኔ</option>
+                                    <option value="ሐምሌ">ሐምሌ</option>
+                                    <option value="ነሐሴ">ነሐሴ</option>
+                                    <option value="ጳጉሜን">ጳጉሜን</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1">ዓመተ ምህረት *</label>
+                                <input type="number" id="eth-year-input" value="2018" onchange="renderEthCalendar()" required class="w-full px-4 py-2.5 rounded-xl border">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1">የተመረጠ ቀን *</label>
+                                <input type="number" id="plan-day-input" readonly placeholder="ከካላንደር ሳጥኑ ላይ ይምረጡ..." class="w-full px-4 py-2.5 rounded-xl border bg-slate-50 font-bold text-indigo-700">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1">የዕቅድ ዓይነት *</label>
+                                <select id="plan-type-select" required class="w-full px-4 py-2.5 rounded-xl border">
+                                    <option value="ንግሥ">ንግሥ (በዓል)</option>
+                                    <option value="ጥናት">የመዝሙር ጥናት</option>
+                                    <option value="ጉባኤ">አጠቃላይ ጉባኤ</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-1">ርዕስ / ዝርዝር መግለጫ *</label>
+                                <input type="text" id="plan-title-input" required placeholder="ለምሳሌ፦ የከተማው ንግሥ..." class="w-full px-4 py-2.5 rounded-xl border">
+                            </div>
+                            <button type="submit" class="w-full py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition">ዕቅዱን መዝግብ</button>
+                        </form>
+                    </div>
+
+                    <!-- የካላንደር 13 ወራት እና 30 የቀን ሳጥኖች ግሪድ -->
+                    <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 id="calendar-header-title" class="text-xl font-extrabold text-royal-900">ህዳር 2018 ዓ.ም</h3>
+                            <span class="text-xs text-slate-500 bg-slate-100 px-3 py-1 rounded-full font-semibold">13 ወራት / 30 ቀናት</span>
+                        </div>
+                        <div id="eth-calendar-grid" class="grid grid-cols-5 sm:grid-cols-7 gap-2.5">
+                            <!-- 30 ቀናት እዚህ ውስጥ በጃቫስክሪፕት ይፈጠራሉ -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal -->
+    <div id="custom-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-royal-950/70 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl text-center space-y-4">
+            <h3 id="modal-title" class="text-xl font-extrabold text-royal-900">ማረጋገጫ</h3>
+            <p id="modal-message" class="text-slate-600 text-sm">...</p>
+            <button onclick="closeModal()" class="w-full py-3 bg-royal-800 text-white font-bold rounded-xl text-sm">እሺ</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs and App Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getDatabase, ref, set, push, remove, onValue, update } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAhTxZkwg91JMuQNs18F0Djht3Udzc8",
+            authDomain: "tseyhe-finot.firebaseapp.com",
+            databaseURL: "https://tseyhe-finot-default-rtdb.firebaseio.com",
+            projectId: "tseyhe-finot",
+            storageBucket: "tseyhe-finot.firebasestorage.app",
+            messagingSenderId: "888526852644",
+            appId: "1:888526852644:web:9bd6bb18a376956d8f7b1",
+            measurementId: "G-JW3759M5C"
+        };
+        const app = initializeApp(firebaseConfig);
+        const rtdb = getDatabase(app);
+
+        // የኢትዮጵያ ካላንደር እና የዕቅድ መመዝገቢያ ፊንክሽኖች
+        window.ethChoirPlans = JSON.parse(localStorage.getItem('ethChoirPlans') || '{}');
+
+        window.selectCalendarDay = function(day) {
+            document.getElementById('plan-day-input').value = day;
+            document.getElementById('plan-title-input').focus();
+        };
+
+        window.saveChoirDayPlan = function(event) {
+            event.preventDefault();
+            const month = document.getElementById('eth-month-select').value;
+            const year = document.getElementById('eth-year-input').value;
+            const day = document.getElementById('plan-day-input').value;
+            const type = document.getElementById('plan-type-select').value;
+            const title = document.getElementById('plan-title-input').value;
+
+            const key = `${month}-${year}-${day}`;
+            window.ethChoirPlans[key] = { type, title };
+            localStorage.setItem('ethChoirPlans', JSON.stringify(window.ethChoirPlans));
+
+            renderEthCalendar();
+            event.target.reset();
+        };
+
+        window.renderEthCalendar = function() {
+            const grid = document.getElementById('eth-calendar-grid');
+            if (!grid) return;
+
+            const month = document.getElementById('eth-month-select').value;
+            const year = document.getElementById('eth-year-input').value;
+            document.getElementById('calendar-header-title').innerText = `${month} ${year} ዓ.ም`;
+
+            const totalDays = (month === 'ጳጉሜን') ? 6 : 30;
+            grid.innerHTML = '';
+
+            for (let d = 1; d <= totalDays; d++) {
+                const key = `${month}-${year}-${d}`;
+                const plan = window.ethChoirPlans[key];
+
+                let cardStyle = 'bg-white border-slate-200 text-slate-800 hover:border-indigo-400';
+                let badge = '';
+
+                if (plan) {
+                    if (plan.type === 'ንግሥ') {
+                        cardStyle = 'bg-amber-50 border-amber-400 text-amber-950 ring-2 ring-amber-400/30';
+                        badge = `<span class="text-[10px] bg-amber-500 text-white px-1.5 py-0.5 rounded font-bold">✓ ንግሥ</span>`;
+                    } else if (plan.type === 'ጥናት') {
+                        cardStyle = 'bg-emerald-50 border-emerald-400 text-emerald-950 ring-2 ring-emerald-400/30';
+                        badge = `<span class="text-[10px] bg-emerald-600 text-white px-1.5 py-0.5 rounded font-bold">✓ ጥናት</span>`;
+                    } else {
+                        cardStyle = 'bg-indigo-50 border-indigo-400 text-indigo-950 ring-2 ring-indigo-400/30';
+                        badge = `<span class="text-[10px] bg-indigo-600 text-white px-1.5 py-0.5 rounded font-bold">✓ ጉባኤ</span>`;
+                    }
+                }
+
+                const cell = document.createElement('div');
+                cell.onclick = () => selectCalendarDay(d);
+                cell.className = `cursor-pointer p-2.5 rounded-2xl border min-h-[85px] flex flex-col justify-between transition-all shadow-sm ${cardStyle}`;
+                cell.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-base font-extrabold">${d}</span>
+                        ${badge}
+                    </div>
+                    <p class="text-[11px] font-semibold leading-tight line-clamp-2 mt-1">${plan ? plan.title : ''}</p>
+                `;
+                grid.appendChild(cell);
+            }
+        };
+
+        setTimeout(renderEthCalendar, 300);
+
+        let currentUserRole = null;
+        const roleCredentials = {
+            'registrar': { pass: 'admin123', name: 'አድሚን 1 / ሬጅስትራል' },
+            'education': { pass: 'edu123', name: 'የትምህርት ክፍል ኃላፊ' },
+            'choir': { pass: 'choir123', name: 'የመዝሙር ክፍል ኃላፊ' },
+            'prayer': { pass: 'prayer123', name: 'የጸሎት ክፍል ኃላፊ' },
+            'communication': { pass: 'comm123', name: 'የግንኙነት ክፍል ኃላፊ' }
+        };
+
+        // Realtime sync from Firebase Database
+        onValue(ref(rtdb, 'students'), (snapshot) => {
+            const data = snapshot.val();
+            window.appStudents = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
+            renderStudents();
+        });
+
+        onValue(ref(rtdb, 'attendance'), (snapshot) => {
+            const data = snapshot.val();
+            window.appAttendance = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse() : [];
+            renderAttendance();
+        });
+
+        onValue(ref(rtdb, 'leaves'), (snapshot) => {
+            const data = snapshot.val();
+            window.appLeaves = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse() : [];
+            renderLeaves();
+        });
+
+        window.handleLoginSubmit = function(event) {
+            event.preventDefault();
+            const role = document.getElementById('login-role').value;
+            const pass = document.getElementById('login-password').value;
+
+            if(!roleCredentials[role] || roleCredentials[role].pass !== pass) {
+                showModal('ስህተት', 'የይለፍ ቃል ወይም ክፍል ስህተት ነው።', '❌');
+                return;
+            }
+
+            currentUserRole = role;
+            const info = roleCredentials[role];
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.remove('hidden');
+            document.getElementById('user-session-header').classList.remove('hidden');
+            document.getElementById('user-session-header').classList.add('flex');
+            document.getElementById('current-logged-role').textContent = info.name;
+            document.getElementById('welcome-username').textContent = info.name;
+            document.getElementById('role-badge-tag').textContent = info.name;
+            document.getElementById('user-avatar-initial').textContent = info.name.charAt(0);
+
+            if(role !== 'registrar') {
+                document.getElementById('registrar-reg-box').style.display = 'none';
+            } else {
+                document.getElementById('registrar-reg-box').style.display = 'block';
+            }
+        };
+
+        window.logoutSystem = function() {
+            currentUserRole = null;
+            document.getElementById('login-view').classList.remove('hidden');
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('user-session-header').classList.add('hidden');
+            document.getElementById('user-session-header').classList.remove('flex');
+            document.getElementById('login-password').value = '';
+        };
+
+        // ትክክለኛው የታብ መቀየሪያ ፊንክሽን (አንድ እና ብቸኛ)
+        window.switchDashboardTab = function(tabName) {
+            ['students', 'attendance', 'leaves', 'choir'].forEach(t => {
+                const content = document.getElementById(`tab-content-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (!content || !btn) return;
+                
+                if (t === tabName) {
+                    content.classList.remove('hidden');
+                    btn.classList.add('bg-royal-800', 'text-white');
+                    btn.classList.remove('bg-white', 'text-slate-600', 'hover:bg-slate-200');
+                } else {
+                    content.classList.add('hidden');
+                    btn.classList.remove('bg-royal-800', 'text-white');
+                    btn.classList.add('bg-white', 'text-slate-600', 'hover:bg-slate-200');
+                }
+            });
+
+            if (tabName === 'choir') {
+                window.renderEthCalendar();
+            }
+        };
+          
+        window.handleStudentRegister = function(event) {
+            event.preventDefault();
+            if (currentUserRole !== 'registrar') {
+                showModal('ዕገዳ', 'ተማሪ መመዝገብ የሚችለው ሬጅስትራል ብቻ ነው።', '⚠️');
+                return;
+            }
+            const fullname = document.getElementById('reg-fullname').value.trim();
+            const christianName = document.getElementById('reg-christian-name').value.trim();
+            const grade = document.getElementById('reg-grade').value;
+            const departments = Array.from(document.querySelectorAll('input[name="dept-checkbox"]:checked')).map(cb => cb.value);
+
+            if(departments.length === 0) {
+                showModal('ስህተት', 'እባክዎ ክፍል ይምረጡ።', '⚠️');
+                return;
+            }
+
+            push(ref(rtdb, 'students'), { fullname, christianName, grade, departments });
+            event.target.reset();
+            showModal('ተሳክቷል', 'ተማሪው በክላውድ ዳታቤዝ ተመዝግቧል።', '✓');
+        };
+
+        window.deleteStudent = function(id) {
+            if(currentUserRole !== 'registrar') return;
+            remove(ref(rtdb, `students/${id}`));
+            showModal('ተሰርዟል', 'ተማሪው ተወግዷል።', '✓');
+        };
+
+        window.handleAttendanceSubmit = function(event) {
+            event.preventDefault();
+            const dept = document.getElementById('att-dept').value;
+            const day = document.getElementById('att-day').value;
+            const student = document.getElementById('att-student-select').value;
+            const status = document.getElementById('att-status').value;
+            const recorder = document.getElementById('att-recorder-name').value.trim();
+
+            push(ref(rtdb, 'attendance'), { dept, day, student, status, recorder });
+            event.target.reset();
+            showModal('ተሳክቷል', 'አቴንዳንሱ ተመዝግቧል።', '✓');
+        };
+
+        window.handleLeaveSubmit = function(event) {
+            event.preventDefault();
+            const student = document.getElementById('leave-student').value;
+            const grantor = document.getElementById('leave-grantor').value.trim();
+            const start = document.getElementById('leave-start').value.trim();
+            const end = document.getElementById('leave-end').value.trim();
+            const receiver = document.getElementById('leave-receiver').value.trim();
+
+            push(ref(rtdb, 'leaves'), { student, grantor, start, end, receiver, status: 'ተጠባባቂ' });
+            event.target.reset();
+            showModal('ተሳክቷል', 'የፍቃድ ፎርሙ ተቀብሏል።', '✓');
+        };
+
+        window.approveLeave = function(id) {
+            if(currentUserRole !== 'registrar') return;
+            update(ref(rtdb, `leaves/${id}`), { status: 'ጸድቋል' });
+            showModal('ጸድቋል', 'ፍቃዱ ጸድቋል።', '✓');
+        };
+
+        function renderStudents() {
+            const students = window.appStudents || [];
+            document.getElementById('stat-total-students').textContent = students.length;
+            document.getElementById('student-count-badge').textContent = `${students.length} ተማሪዎች`;
+            
+            const tbody = document.getElementById('students-table-body');
+            tbody.innerHTML = '';
+            const attSelect = document.getElementById('att-student-select');
+            const leaveSelect = document.getElementById('leave-student');
+            attSelect.innerHTML = '<option value="">-- ተማሪ ይምረጡ --</option>';
+            leaveSelect.innerHTML = '<option value="">-- ተማሪ ይምረጡ --</option>';
+
+            students.forEach(s => {
+                attSelect.innerHTML += `<option value="${s.fullname}">${s.fullname} (${s.grade})</option>`;
+                leaveSelect.innerHTML += `<option value="${s.fullname}">${s.fullname} (${s.grade})</option>`;
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="py-3 px-3"><span class="font-bold text-royal-900 block">${s.fullname}</span><span class="text-xs text-slate-500">${s.christianName}</span></td>
+                        <td class="py-3 px-3">${s.grade}</td>
+                        <td class="py-3 px-3">${s.departments ? s.departments.join(', ') : ''}</td>
+                        <td class="py-3 px-3 text-center">
+                            ${currentUserRole === 'registrar' ? `<button onclick="deleteStudent('${s.id}')" class="text-rose-600 text-xs font-bold px-2 py-1 bg-rose-50 rounded">ሰርዝ</button>` : '-'}
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderAttendance() {
+            const tbody = document.getElementById('attendance-table-body');
+            tbody.innerHTML = '';
+            (window.appAttendance || []).forEach(a => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="py-2">${a.day}</td><td class="py-2 text-royal-800 font-bold">${a.dept}</td><td class="py-2 font-bold">${a.student}</td><td class="py-2">${a.status}</td><td class="py-2 text-xs">${a.recorder}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderLeaves() {
+            const tbody = document.getElementById('leaves-table-body');
+            tbody.innerHTML = '';
+            let pending = 0;
+            (window.appLeaves || []).forEach(l => {
+                if(l.status === 'ተጠባባቂ') pending++;
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="py-2 font-bold">${l.student}</td><td class="py-2 text-xs">${l.start} - ${l.end}</td><td class="py-2"><span class="px-2 py-1 rounded text-xs font-bold ${l.status === 'ጸድቋል' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">${l.status}</span></td>
+                        <td class="py-2 text-center">
+                            ${currentUserRole === 'registrar' && l.status === 'ተጠባባቂ' ? `<button onclick="approveLeave('${l.id}')" class="px-2 py-1 bg-emerald-600 text-white text-xs rounded font-bold">አጽድቅ</button>` : '-'}
+                        </td>
+                    </tr>
+                `;
+            });
+            document.getElementById('stat-pending-leaves').textContent = pending;
+        }
+
+        window.showModal = function(title, message, icon = '✓') {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            const modal = document.getElementById('custom-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.closeModal = function() {
+            document.getElementById('custom-modal').classList.add('hidden');
+            document.getElementById('custom-modal').classList.remove('flex');
+        };
+    </script>
+</body>
+</html>
